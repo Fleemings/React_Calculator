@@ -22,23 +22,69 @@ class Calculator extends Component {
     this.setState({ ...initialState });
   }
 
-  setOperation(operation) {}
+  setOperation(operation) {
+    if (this.state.current === 0) {
+      this.setState({ operation, current: 1, clearDisplay: true });
+    } else {
+      const equals = operation === '=';
+      const values = [...this.state.values];
+      console.log(values);
+      let result;
+      let operationValue = this.state.operation;
+
+      switch (operationValue) {
+        case '/':
+          result = values[0] / values[1];
+          break;
+        case '*':
+          result = values[0] * values[1];
+          break;
+        case '-':
+          result = values[0] - values[1];
+          break;
+        case '+':
+          result = values[0] + values[1];
+          break;
+        case '.':
+          result = values[0] + '.' + values[1];
+          break;
+        default:
+          values[0] = 0;
+          break;
+      }
+
+      console.log(values);
+
+      this.setState({
+        displayValue: result,
+        operation: equals ? null : operation,
+        current: equals ? 0 : 1,
+        clearDisplay: true || !equals,
+        values: [result, 0] || [0, 0],
+      });
+    }
+  }
 
   addDigit(digit) {
     if (digit === '.' && this.state.displayValue.includes('.')) {
-      return;
+      return this.state.displayValue;
     }
-
+    // if value is equal to 0 or clear display is false
     const clearDisplay =
       this.state.displayValue === '0' || this.state.clearDisplay;
+    // if clearDisplay is true or current diggit
     const currentValue = clearDisplay ? '' : this.state.displayValue;
+    // current value plus new diggit added
     const displayValue = currentValue + digit;
     this.setState({ displayValue, clearDisplay: false });
 
     if (digit !== '.') {
       const indice = this.state.current;
+      // converts display value into a floating-point number
       const newValue = parseFloat(displayValue);
+      // takes the initial state of value and create a new array of values
       const values = [...this.state.values];
+      // Added the display value into the current indice before or after the operation
       values[indice] = newValue;
       this.setState({ values });
     }
